@@ -320,7 +320,7 @@ public class Principal extends javax.swing.JFrame {
 
     private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
         // TODO add your handling code here:
-            int selecao = -1;//Fazer CAST e pegar item to combo
+            int selecao = ((Item) jcFuncChefes.getSelectedItem()).id;
             Funcionario funcionario = controle.buscaFuncionarioId(selecao);
 
             //Se funcionario é diferente de null (!= null) ele está no banco
@@ -346,12 +346,9 @@ public class Principal extends javax.swing.JFrame {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jButton8ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton8ActionPerformed
-        // TODO add your handling code here:
             String jornada = jcHorasFunc.getModel().getSelectedItem().toString();
             int idFuncionario = controle.salvarFuncionario(jtNomeFunc.getText(), jornada, jtEspecialidades.getText());
-            
-            //criar classe interna Item
-            //addItem(new Item())
+                        jcFuncChefes.addItem(new Item(idFuncionario, jtNomeFunc.getText()));
             
             jtNomeFunc.setText("");
             jtEspecialidadeFunc.setText("");
@@ -397,8 +394,33 @@ public class Principal extends javax.swing.JFrame {
             }
         });
     }
+    
+    private class Item {
+        private int id;
+        private String nome;
+        
+        public Item(int id, String nome) {
+            this.id = id;
+            this.nome = nome;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getNome() {
+            return nome;
+        }
+
+        @Override
+        public String toString() {
+            return this.getNome();
+        }
+        
+    }
 
     private Controle controle = new Controle();
+    
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton13;
     private javax.swing.JButton jButton3;

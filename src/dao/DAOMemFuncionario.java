@@ -16,7 +16,6 @@ import model.Funcionario;
 public class DAOMemFuncionario implements DAO<Funcionario> {
     private static int ULTIMO_ID = 0;
     private static final List<Funcionario> funcionarioDB = new ArrayList<>();
-    
     @Override
     public int salvar(Funcionario f) throws DAOException {
         if (f.getId() == -1) {
@@ -59,7 +58,7 @@ public class DAOMemFuncionario implements DAO<Funcionario> {
     @Override
     public List<Funcionario> buscarTodos() throws DAOException {
         try {
-            return this.funcionarioDB;
+            return funcionarioDB;
         } catch(RuntimeException ex){
             throw new DAOException("Erro ao listar todos " + ex.getMessage());
         } //fim try
