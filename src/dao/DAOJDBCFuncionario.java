@@ -11,6 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
 import java.util.List;
 import model.Chefe;
 import model.Funcionario;
@@ -104,24 +105,23 @@ public class DAOJDBCFuncionario implements DAO<Funcionario> {
                         rs.getString(4)); //especialidades
                 String queryChefe = "SELECT * FROM CHEFE"
                         + " WHERE ID = ?";
-                try (PreparedStatement psChefe = conn.prepareStatement(queryChefe)){
+                try (PreparedStatement psChefe = conn.prepareStatement(queryChefe)) {
                     psChefe.setInt(1, rs.getInt(5)); //id do chefe
                     ResultSet rsChefe = psChefe.executeQuery();
-                    if (rsChefe.next()){
+                    if (rsChefe.next()) {
                         Chefe c = new Chefe(
                                 rsChefe.getInt(1), //id do chefe
                                 rsChefe.getString(2), //nome do chefe
                                 rsChefe.getString(3), //setor
                                 rsChefe.getString(4), //jornada
                                 null);                 //funcionarios
-                    f.setChefe(c);
+                        f.setChefe(c);
                     } //fim if
                     return f;
                 } catch (SQLException e) {
                     throw new DAOException("Erro ao buscar chefe!" + e.getMessage());
                 }
-            
-         
+
             }
         } catch (SQLException e) {
             throw new DAOException("Erro ao buscar por ID " + e.getMessage());
@@ -131,12 +131,51 @@ public class DAOJDBCFuncionario implements DAO<Funcionario> {
 
     @Override
     public List<Funcionario> buscarTodos() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        List<Funcionario> funcionarios = new ArrayList<>();
+        try (Statement stmt = conn.createStatement()) {
+            String query = "SELECT * FROM FUNCIONARIO";
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                Funcionario f = new Funcionario(
+                        rs.getInt(1), //ID
+                        rs.getString(2), //nome
+                        rs.getString(3), //jornada
+                        rs.getString(4)); //especialidades
+                String queryChefe = "SELECT * FROM CHEFE"
+                        + " WHERE ID = ?";
+                try (PreparedStatement psChefe = conn.prepareStatement(queryChefe)) {
+                    psChefe.setInt(1, rs.getInt(5)); //id do chefe
+                    ResultSet rsChefe = psChefe.executeQuery();
+                    if (rsChefe.next()) {
+                        Chefe c = new Chefe(
+                                rsChefe.getInt(1), //id do chefe
+                                rsChefe.getString(2), //nome do chefe
+                                rsChefe.getString(3), //setor
+                                rsChefe.getString(4), //jornada
+                                null);                 //funcionarios
+                        f.setChefe(c);
+                    } //fim if
+                    funcionarios.add(f);
+
+                } catch (SQLException e) {
+                    throw new DAOException("Erro ao buscar chefe!" + e.getMessage());
+                } //fim try 
+
+            } //fim while
+            return funcionarios;
+        } catch (SQLException e) {
+            throw new DAOException("Erro ao buscar funcionários " + e.getMessage());
+        } //fim try
     }
 
     @Override
     public void close() throws DAOException {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
+        try {
+            conn.close();
+            System.out.println("Conexão fechada!");
+        } catch (SQLException ex) {
+            throw new DAOException("Erro ao fechar conexão! " + ex.getMessage());
+        }
 
+    }
 }

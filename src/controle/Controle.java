@@ -2,6 +2,7 @@ package controle;
 
 import dao.DAO;
 import dao.DAOException;
+import dao.DAOFactory;
 import dao.DAOMemChefe;
 import dao.DAOMemFuncionario;
 import java.util.ArrayList;
@@ -21,7 +22,7 @@ public class Controle {
     
     private List<Funcionario> tempFuncionarios = new ArrayList();
     //pegar uma instancia da fábrica de DAO
-
+    private DAOFactory factory = DAOFactory.getInstance();
     public void adicionarFuncionarioTemp(Funcionario funcionario) {
         if (!tempFuncionarios.contains(funcionario)) {
             this.tempFuncionarios.add(funcionario);
@@ -41,7 +42,7 @@ public class Controle {
         Funcionario funcionario = new Funcionario(-1, nome, jornada, especialidades);
 
         //invocar DAO
-        try (DAO daoFuncionario = new DAOMemFuncionario()) {
+        try (DAO daoFuncionario = factory.createDAO(Funcionario.class)) {
             return daoFuncionario.salvar(funcionario);
 
         } catch (DAOException ex) {
@@ -53,7 +54,7 @@ public class Controle {
     public int salvarFuncionario(Funcionario funcionario) {
 
         //invocar DAO
-        try (DAO daoFuncionario = new DAOMemFuncionario()) {
+        try (DAO daoFuncionario = factory.createDAO(Funcionario.class)) {
             return daoFuncionario.salvar(funcionario);
 
         } catch (DAOException e) {
@@ -69,7 +70,7 @@ public class Controle {
         int codigoChefe = -1;
 
         //invocar DAO
-        try (DAO daoChefe = new DAOMemChefe()) {
+        try (DAO daoChefe = factory.createDAO(Chefe.class)) {
             codigoChefe = daoChefe.salvar(chefe);
             for (Funcionario f : funcionarios) {
                 f.setChefe(chefe);
@@ -85,7 +86,7 @@ public class Controle {
     public Funcionario buscaFuncionarioId(int id) {
 
         //invocar DAO
-        try (DAO daoFuncionario = new DAOMemFuncionario()) {
+        try (DAO daoFuncionario = factory.createDAO(Funcionario.class)) {
             return (Funcionario) daoFuncionario.buscarId(id);
         } catch (DAOException e) {
             System.out.println("Dados não localizados" + e.getMessage());
@@ -94,7 +95,7 @@ public class Controle {
     }//fim metodo
 
     public Chefe buscarChefeId(int id) {
-        try (DAO daoChefe = new DAOMemChefe()) {
+        try (DAO daoChefe = factory.createDAO(Chefe.class)) {
             return (Chefe) daoChefe.buscarId(id);
         } catch (DAOException e) {
             System.out.println("Dados não localizados! " + e.getMessage());
@@ -108,7 +109,7 @@ public class Controle {
     }
 
     public List<Chefe> buscarChefes() {
-        try(DAO daoChefe = new DAOMemChefe()) {
+        try(DAO daoChefe = factory.createDAO(Chefe.class)) {
             return daoChefe.buscarTodos();
         } catch (DAOException e) {
             System.out.println("Dados não localizados! " + e.getMessage());
